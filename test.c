@@ -4,36 +4,44 @@
  
 int main()
 {
-	int fd[2];
+	int pfd[2];
 	pid_t pid;
-	char buffer[13];
+	// char buffer[13];
  
-	if (pipe(fd) == -1)
+	if (pipe(pfd) == -1)
 	{
 		perror("pipe");
 		exit(EXIT_FAILURE);
 	}
- 
 	pid = fork();
 	if (pid == -1)
 	{
 		perror("fork");
 		exit(EXIT_FAILURE);
 	}
- 
-	if (pid == 0)
+	else if (pid == 0)
 	{
-		close(fd[0]); // close the read end of the pipe
-		write(fd[1], "Hello parent!", 13);
-		close(fd[1]); // close the write end of the pipe
-		exit(EXIT_SUCCESS);
+		close(pfd[0]); //close unused end (the reading end) of the pipe
+		dup2(pfd[1], STDOUT_FILENO);
+ 		char *args[2] = {"ls", NULL}; 
+		execve("/bin/ls", args, NULL);
+		// exit(EXIT_SUCCESS);     
 	}
-	else
+
+	int pid2 = fork();
+	if (pid2 < 0)
+		return (2);
+	if (pid2 == 0) // child process 2
 	{
-		close(fd[1]); // close the write end of the pipe
-		read(fd[0], buffer, 13);
-		close(fd[0]); // close the read end of the pipe
-		printf("Message from child: '%.*s'\n", 13, buffer);
-		exit(EXIT_SUCCESS);
+		close(pfd[1]); //close unused end (the writing end) of the pipe
+		dup2(pfd[0], STDIN_FILENO);
+		close(pfd[0]); //close it immediately as it will no longer be used
+ 		char *args[2] = {"wc", NULL}; 
+		execve("/usr/bin/wc", args, NULL);
 	}
+
+	// close(pfd[0]);
+	// close(pfd[1]);
+	waitpid(pid, NULL, 0);
+	waitpid(pid2, NULL, 0);
 }
