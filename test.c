@@ -6,13 +6,13 @@ int main()
 {
 	int pfd[2];
 	pid_t pid;
-	// char buffer[13];
  
 	if (pipe(pfd) == -1)
 	{
 		perror("pipe");
 		exit(EXIT_FAILURE);
 	}
+	// -------------
 	pid = fork();
 	if (pid == -1)
 	{
@@ -23,14 +23,18 @@ int main()
 	{
 		close(pfd[0]); //close unused end (the reading end) of the pipe
 		dup2(pfd[1], STDOUT_FILENO);
+		close(pfd[1]);
  		char *args[2] = {"ls", NULL}; 
 		execve("/bin/ls", args, NULL);
-		// exit(EXIT_SUCCESS);     
 	}
 
+	// --------------
 	int pid2 = fork();
-	if (pid2 < 0)
-		return (2);
+	if (pid2 == -1)
+	{
+		perror("fork");
+		exit(EXIT_FAILURE);
+	}
 	if (pid2 == 0) // child process 2
 	{
 		close(pfd[1]); //close unused end (the writing end) of the pipe
@@ -40,8 +44,8 @@ int main()
 		execve("/usr/bin/wc", args, NULL);
 	}
 
-	// close(pfd[0]);
-	// close(pfd[1]);
+	close(pfd[1]); // ? close write end of pipe to sign end of input to 'wc' command in 2nd child process
 	waitpid(pid, NULL, 0);
 	waitpid(pid2, NULL, 0);
+	printf("this msg should appear after child process finish\n");
 }
