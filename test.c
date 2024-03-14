@@ -1,10 +1,10 @@
 #include "./includes/pipex.h"
- 
+
 int main()
 {
 	int pfd[2];
 	pid_t pid;
- 
+
 	if (pipe(pfd) == -1)
 	{
 		perror("pipe");
@@ -20,11 +20,11 @@ int main()
 	else if (pid == 0)
 	{
 		close(pfd[R_END]); //close unused end (the reading end) of the pipe
-		dup2(pfd[W_END], STDOUT_FILENO);
+		dup2(pfd[W_END], STDOUT_FILENO); // replace pdf[1] with stdout to become write end of the pipe
 		close(pfd[W_END]);
- 		char *args[2] = {"ls", NULL}; 
+ 		char *args[2] = {"ls", NULL};
 		execve("/bin/ls", args, NULL);
-		if (execve("/bin/ls", args, NULL) == -1) 
+		if (execve("/bin/ls", args, NULL) == -1)
 		{
 			perror("execve");
 			exit(EXIT_FAILURE);
@@ -41,10 +41,10 @@ int main()
 	if (pid2 == 0) // child process 2
 	{
 		close(pfd[W_END]); //close unused end (the writing end) of the pipe
-		dup2(pfd[R_END], STDIN_FILENO);
+		dup2(pfd[R_END], STDIN_FILENO); // replace pdf[0] with stdin to become read end of the pipe
 		close(pfd[R_END]); //close it immediately as it will no longer be used
- 		char *args[2] = {"wc", NULL}; 
-		if (execve("/usr/bin/wc", args, NULL) == -1) 
+ 		char *args[2] = {"wc", NULL};
+		if (execve("/usr/bin/wc", args, NULL) == -1)
 		{
 			perror("execve");
 			exit(EXIT_FAILURE);
