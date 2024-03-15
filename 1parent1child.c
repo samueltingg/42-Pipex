@@ -31,7 +31,7 @@ int main()
 	else if (pid > 0) // parent process
 	{
 		waitpid(pid, NULL, 0);
-		// close(pfd[W_END]); //close unused end (the writing end) of the pipe
+		close(pfd[W_END]); //close unused end (the writing end) of the pipe
 		dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
 		close(pfd[R_END]); //close it immediately as it will no longer be used
  		char *args[2] = {"wc", NULL};
