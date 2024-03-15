@@ -35,6 +35,8 @@ int main()
 			exit(EXIT_FAILURE);
     	}
 	}
+	close(pfd[W_END]); // close write end of pipe to sign end of input to 'wc' command in 2nd child process
+
 
 	// --------------
 	int pfd2[2];
@@ -66,6 +68,8 @@ int main()
 			exit(EXIT_FAILURE);
     	}
 	}
+	close(pfd[R_END]); // read end in parent process is not used
+	close(pfd2[W_END]);
 
 	int pid3 = fork();
 	if (pid3 == -1)
@@ -75,7 +79,8 @@ int main()
 	}
 	if (pid3 == 0) // child process 3
 	{
-		close(pfd[W_END]); // ! PROBLEM SOLVED!
+		// close(pfd[W_END]); // ! PROBLEM SOLVED!
+
 		close(pfd2[W_END]); //close unused end (the writing end) of the pipe
 		dup2(pfd2[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
 		close(pfd2[R_END]); //close it immediately as it will no longer be used
@@ -87,16 +92,10 @@ int main()
 			exit(EXIT_FAILURE);
     	}
 	}
-
-	close(pfd[R_END]); // read end in parent process is not used
-	waitpid(pid, NULL, 0);
-
-	close(pfd[W_END]); // ? close write end of pipe to sign end of input to 'wc' command in 2nd child process
-
 	close(pfd2[R_END]);
-	waitpid(pid2, NULL, 0);
-	close(pfd2[W_END]);
 
+	waitpid(pid, NULL, 0);
+	waitpid(pid2, NULL, 0);
 	waitpid(pid3, NULL, 0);
 	// printf("this msg should appear after child process finish\n");
 }
