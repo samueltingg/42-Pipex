@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: sting <sting@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/03/18 10:01:53 by sting             #+#    #+#             */
-/*   Updated: 2024/03/19 09:33:28 by sting            ###   ########.fr       */
+/*   Created: 2024/03/12 15:46:10 by sting             #+#    #+#             */
+/*   Updated: 2024/03/19 12:35:01 by sting            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ int main(int argc, char **argv, char **env)
 		perror("Unable to open the file");
 		exit(EXIT_FAILURE);
 	}
+	
 		
 	int pfd[2];
 	pid_t pid;
