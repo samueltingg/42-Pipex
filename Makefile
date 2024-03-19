@@ -11,10 +11,9 @@ ORANGE = \033[0;38;5;166m
 # SRCS
 SRCDIR = srcs/
 SRCS_FIL = \
-			main.c
-			
+			main.c \
+			execve_utils.c			
   
-
 SRCS = $(addprefix $(SRCDIR), $(SRCS_FIL))
 
 # OBS
@@ -35,7 +34,7 @@ $(OBJDIR):
 
 $(NAME): $(OBJS)
 		@make -C $(LIBFT_DIR)
-		@$(CC) $(CFLAGS) $(OBJS) -o $(NAME) && echo "$(GREEN)$(NAME) was created$(RESET)"
+		@$(CC) $(CFLAGS) $(OBJS) -o $(NAME) -L$(LIBFT_DIR) -lft && echo "$(GREEN)$(NAME) was created$(RESET)"
 
 $(OBJDIR)%.o: $(SRCDIR)%.c
 		@$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES) && echo "$(GREEN)object files were created$(RESET)"
