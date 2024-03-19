@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 # include <fcntl.h>
+# include "./libft/libft.h"
 
 typedef struct t_file
 {
