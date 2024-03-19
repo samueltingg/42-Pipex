@@ -4,6 +4,7 @@
 # define R_END 0
 # define W_END 1
 
+#include "./libft/libft.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
