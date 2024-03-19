@@ -8,5 +8,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+# include <fcntl.h>
+
+typedef struct t_file
+{
+	int *in;
+	int *out;
+}			t_file;
 
 #endif
