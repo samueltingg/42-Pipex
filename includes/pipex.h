@@ -18,5 +18,6 @@ typedef struct t_file
 }		t_file;
 
 char	*get_cmd_path(char *cmd, char **env);
+void    callexecve(char *cmd, char **env);
 
 #endif

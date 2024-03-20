@@ -15,7 +15,7 @@
 int main(int argc, char **argv, char **env)
 {
 
-	(void)env; // ! remove`
+	
 	// * parse "infile" & "outfile"
 	t_file file_fd;
 	
@@ -41,43 +41,43 @@ int main(int argc, char **argv, char **env)
 	cmd_count = argc - 3;
 	int i = -1;
 	int j = 2;
+	int pfd[2];
+	pid_t pid;
+
+	dup2(file_fd.in, STDIN_FILENO);
 	while (++i < cmd_count)
 	{
-		printf("%s\n", argv[j++]);
+		if (pipe(pfd) == -1)
+		{
+			perror("pipe");
+			exit(EXIT_FAILURE);
+		}
+		pid = fork();
+		if (pid == -1)
+		{
+			perror("fork");
+			exit(EXIT_FAILURE);
+		}
+		else if (pid == 0) // * child
+		{
+			close(pfd[R_END]); 	// lose unused end (the reading end) of the pipe
+			dup2(pfd[W_END], STDOUT_FILENO); //	replace pfd[1] with stdout to become write end of the pipe
+			close(pfd[W_END]);
+
+			callexecve(argv[j], env);
+ 			// char *args[2] = {"ls", NULL};
+			// if (execve("/bin/ls", args, NULL) == -1)
+			// {
+				// perror("execve");
+				// exit(EXIT_FAILURE);
+    		// }
+		}
+		else if (pid > 0) // * parent
+		{
+			waitpid(pid, NULL, 0); 
+			close(pfd[W_END]); // lose unused end (the writing end) of the pipe
+			dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
+			close(pfd[R_END]); 	// lose it immediately as it will no longer be used
+		}
 	}
-		
-	// int pfd[2];
-	// pid_t pid;
-	
-	// if (pipe(pfd) == -1)
-	// {
-	// 	perror("pipe");
-	// 	exit(EXIT_FAILURE);
-	// }
-	// // -------------
-	// pid = fork();
-	// if (pid == -1)
-	// {
-	// 	perror("fork");
-	// 	exit(EXIT_FAILURE);
-	// }
-	// else if (pid == 0) // * child
-	// {
-	// 	close(pfd[R_END]); //close unused end (the reading end) of the pipe
-	// 	dup2(pfd[W_END], STDOUT_FILENO); // replace pfd[1] with stdout to become write end of the pipe
-	// 	close(pfd[W_END]);
- 	// 	char *args[2] = {"ls", NULL};
-	// 	if (execve("/bin/ls", args, NULL) == -1)
-	// 	{
-	// 		perror("execve");
-	// 		exit(EXIT_FAILURE);
-    // 	}
-	// }
-	// else if (pid > 0) // * parent
-	// {
-	// 	waitpid(pid, NULL, 0); 
-	// 	close(pfd[W_END]); //close unused end (the writing end) of the pipe
-	// 	dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
-	// 	close(pfd[R_END]); //close it immediately as it will no longer be used
-	// }
 }

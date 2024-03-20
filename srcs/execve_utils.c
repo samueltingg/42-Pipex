@@ -63,9 +63,13 @@ char *get_cmd_path(char *cmd, char **env) // * TESTED!
 void    callexecve(char *cmd, char **env)
 {
     char *args;
+    char *path;
 
     args = ft_split(cmd, ' ');
-    execve(get_cmd_path(cmd, env), args, env);
+    if (args == NULL)
+        exit(EXIT_FAILURE); // ! free other stuff?
+    path = get_cmd_path(args[0], env);
+    execve(path, args, env);
     perror("execve");
     exit(EXIT_FAILURE); // Make sure to exit the child process if execve fails 
 }
