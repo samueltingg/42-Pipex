@@ -69,8 +69,7 @@ char *get_cmd_path(char *cmd, char **env) // * TESTED!
             }
         }   
     }
-
-    free_str
+    free_str_arr(str_arr);
     return (path);
 }
 
