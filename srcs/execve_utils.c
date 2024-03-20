@@ -12,6 +12,19 @@
 
 #include ".././includes/pipex.h"
 
+void	free_str_arr(char **str_arr)
+{
+	int	i;
+
+	i = 0;
+	while (str_arr[i] != NULL)
+	{
+		free(str_arr[i]);
+		i++;
+	}
+	free(str_arr);
+}
+
 char *get_cmd_path(char *cmd, char **env) // * TESTED!
 {
     int i;
@@ -56,13 +69,14 @@ char *get_cmd_path(char *cmd, char **env) // * TESTED!
             }
         }   
     }
-     
+
+    free_str
     return (path);
 }
 
 void    callexecve(char *cmd, char **env)
 {
-    char *args;
+    char **args;
     char *path;
 
     args = ft_split(cmd, ' ');

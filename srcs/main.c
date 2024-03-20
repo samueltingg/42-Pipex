@@ -61,7 +61,10 @@ int main(int argc, char **argv, char **env)
 		else if (pid == 0) // * child
 		{
 			close(pfd[R_END]); 	// lose unused end (the reading end) of the pipe
-			dup2(pfd[W_END], STDOUT_FILENO); //	replace pfd[1] with stdout to become write end of the pipe
+			if (j == (cmd_count - 1)) // if at last cmd
+				dup2(file_fd.out, STDOUT_FILENO);
+			else
+				dup2(pfd[W_END], STDOUT_FILENO); //	replace pfd[1] with stdout to become write end of the pipe
 			close(pfd[W_END]);
 
 			callexecve(argv[j], env);
@@ -76,7 +79,8 @@ int main(int argc, char **argv, char **env)
 		{
 			waitpid(pid, NULL, 0); 
 			close(pfd[W_END]); // lose unused end (the writing end) of the pipe
-			dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
+			if (j != (cmd_count - 1)) // if at last cmd 
+				dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
 			close(pfd[R_END]); 	// lose it immediately as it will no longer be used
 		}
 	}
