@@ -6,7 +6,7 @@
 /*   By: sting <sting@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 15:46:10 by sting             #+#    #+#             */
-/*   Updated: 2024/03/21 09:30:04 by sting            ###   ########.fr       */
+/*   Updated: 2024/03/21 16:42:01 by sting            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,12 +77,13 @@ int main(int argc, char **argv, char **env)
 		}
 		else if (pid > 0) // * PARENT 
 		{
-			waitpid(pid, NULL, 0); 
+			// waitpid(pid, NULL, 0); // ! is this necessary??
 			close(pfd[W_END]); // lose unused end (the writing end) of the pipe
-			if (i != (cmd_count - 1)) // if at last cmd 
+			if (i != (cmd_count - 1)) // if not at last cmd 
 				dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
 			close(pfd[R_END]); 	// lose it immediately as it will no longer be used
 		}
 		j++;
 	}
 }
+ 

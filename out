@@ -2,10 +2,14 @@
 1parent2child.c
 1parent2child_v2.c
 Makefile
-file
+PIPEX_TESTER
+cat
 includes
+infile
 libft
 objs
 out
 pipex
+pipex-tester
+pipex_tester_42
 srcs
