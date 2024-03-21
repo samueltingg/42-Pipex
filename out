@@ -1,1 +1,11 @@
- 0  3 14
+1parent1child.c
+1parent2child.c
+1parent2child_v2.c
+Makefile
+file
+includes
+libft
+objs
+out
+pipex
+srcs

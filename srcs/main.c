@@ -6,7 +6,7 @@
 /*   By: sting <sting@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 15:46:10 by sting             #+#    #+#             */
-/*   Updated: 2024/03/19 16:11:33 by sting            ###   ########.fr       */
+/*   Updated: 2024/03/21 09:30:04 by sting            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,18 +47,18 @@ int main(int argc, char **argv, char **env)
 	dup2(file_fd.in, STDIN_FILENO);
 	while (++i < cmd_count)
 	{
-		if (pipe(pfd) == -1)
+		if (pipe(pfd) == -1) // * PIPE
 		{
 			perror("pipe");
 			exit(EXIT_FAILURE);
 		}
-		pid = fork();
+		pid = fork(); // * FORK
 		if (pid == -1)
 		{
 			perror("fork");
 			exit(EXIT_FAILURE);
 		}
-		else if (pid == 0) // * child
+		else if (pid == 0) // * CHILD
 		{
 			close(pfd[R_END]); 	// lose unused end (the reading end) of the pipe
 			if (i == (cmd_count - 1)) // if at last cmd
@@ -75,7 +75,7 @@ int main(int argc, char **argv, char **env)
 				// exit(EXIT_FAILURE);
     		// }
 		}
-		else if (pid > 0) // * parent
+		else if (pid > 0) // * PARENT 
 		{
 			waitpid(pid, NULL, 0); 
 			close(pfd[W_END]); // lose unused end (the writing end) of the pipe
