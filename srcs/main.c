@@ -6,7 +6,7 @@
 /*   By: sting <sting@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 15:46:10 by sting             #+#    #+#             */
-/*   Updated: 2024/03/21 16:42:01 by sting            ###   ########.fr       */
+/*   Updated: 2024/03/22 15:10:35 by sting            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 int main(int argc, char **argv, char **env)
 {
-
-	
 	// * parse "infile" & "outfile"
 	t_file file_fd;
 	
@@ -62,22 +60,18 @@ int main(int argc, char **argv, char **env)
 		{
 			close(pfd[R_END]); 	// lose unused end (the reading end) of the pipe
 			if (i == (cmd_count - 1)) // if at last cmd
+			{
 				dup2(file_fd.out, STDOUT_FILENO);
+				close(file_fd.out);
+			}
 			else
 				dup2(pfd[W_END], STDOUT_FILENO); //	replace pfd[1] with stdout to become write end of the pipe
 			close(pfd[W_END]);
-
 			callexecve(argv[j], env);
- 			// char *args[2] = {"ls", NULL};
-			// if (execve("/bin/ls", args, NULL) == -1)
-			// {
-				// perror("execve");
-				// exit(EXIT_FAILURE);
-    		// }
 		}
 		else if (pid > 0) // * PARENT 
 		{
-			// waitpid(pid, NULL, 0); // ! is this necessary??
+			waitpid(pid, NULL, 0);
 			close(pfd[W_END]); // lose unused end (the writing end) of the pipe
 			if (i != (cmd_count - 1)) // if not at last cmd 
 				dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
@@ -85,5 +79,6 @@ int main(int argc, char **argv, char **env)
 		}
 		j++;
 	}
+	// close(file_fd.in); // ! where to close ?
 }
  
