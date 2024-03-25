@@ -6,7 +6,7 @@
 /*   By: sting <sting@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 15:46:10 by sting             #+#    #+#             */
-/*   Updated: 2024/03/25 16:02:34 by sting            ###   ########.fr       */
+/*   Updated: 2024/03/25 16:42:28 by sting            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,43 @@ void exit_if_error(enum e_type type)
 		perror("Invalid command");
 	exit(EXIT_FAILURE);
 }
+void handle_pipe_execution(char **argv, t_file *file_fd, char **env)
+{
+	int i;
+	pid_t pid;
+
+	i = -1;
+	while (++i < cmd_count)
+	{
+		if (pipe(pfd) == -1) // * PIPE
+			exit_if_error(PIPE);
+		pid = fork(); // * FORK
+		if (pid == -1)
+			exit_if_error(FORK);
+		else if (pid == 0) // * CHILD
+		{
+			close(pfd[R_END]); 	// lose unused end (the reading end) of the pipe
+			if (i == (cmd_count - 1)) // if at last cmd
+			{
+				dup2(file_fd.out, STDOUT_FILENO);
+				close(file_fd.out);
+			}
+			else
+				dup2(pfd[W_END], STDOUT_FILENO); //	replace pfd[1] with stdout to become write end of the pipe
+			close(pfd[W_END]);
+			callexecve(argv[j], env);
+		}
+		else if (pid > 0) // * PARENT 
+		{
+			close(pfd[W_END]); // lose unused end (the writing end) of the pipe
+			if (i != (cmd_count - 1)) // if not at last cmd 
+				dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
+			close(pfd[R_END]); 	// lose it immediately as it will no longer be used
+			waitpid(pid, NULL, 0);
+		}
+		j++;
+	}
+}
 
 
 /*
@@ -38,7 +75,7 @@ int main(int argc, char **argv, char **env)
 {
 	t_file file_fd;
 	int cmd_count;
-	int i;
+	// int i;
 	int j;
 	int pfd[2];
 	pid_t pid;
@@ -50,7 +87,7 @@ int main(int argc, char **argv, char **env)
 	}
 	
 	// ? here_doc =======
-	i = -1;
+	// i = -1;
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 	{
 		cmd_count = argc - 4;
@@ -88,40 +125,38 @@ int main(int argc, char **argv, char **env)
 	}
 	// ? ==========
 
-	dup2(file_fd.in, STDIN_FILENO);
-	close(file_fd.in); // ! where to close ?
-	while (++i < cmd_count)
-	{
-		if (pipe(pfd) == -1) // * PIPE
-			exit_if_error(PIPE);
-		pid = fork(); // * FORK
-		if (pid == -1)
-		{
-			exit_if_error(FORK);
-		}
-		else if (pid == 0) // * CHILD
-		{
-			close(pfd[R_END]); 	// lose unused end (the reading end) of the pipe
-			if (i == (cmd_count - 1)) // if at last cmd
-			{
-				dup2(file_fd.out, STDOUT_FILENO);
-				close(file_fd.out);
-			}
-			else
-				dup2(pfd[W_END], STDOUT_FILENO); //	replace pfd[1] with stdout to become write end of the pipe
-			close(pfd[W_END]);
-			callexecve(argv[j], env);
-		}
-		else if (pid > 0) // * PARENT 
-		{
-			close(pfd[W_END]); // lose unused end (the writing end) of the pipe
-			if (i != (cmd_count - 1)) // if not at last cmd 
-				dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
-			close(pfd[R_END]); 	// lose it immediately as it will no longer be used
-			waitpid(pid, NULL, 0);
-		}
-		j++;
-	}
+	// dup2(file_fd.in, STDIN_FILENO);
+	// close(file_fd.in); // ! where to close ?
+	// while (++i < cmd_count)
+	// {
+	// 	if (pipe(pfd) == -1) // * PIPE
+	// 		exit_if_error(PIPE);
+	// 	pid = fork(); // * FORK
+	// 	if (pid == -1)
+	// 		exit_if_error(FORK);
+	// 	else if (pid == 0) // * CHILD
+	// 	{
+	// 		close(pfd[R_END]); 	// lose unused end (the reading end) of the pipe
+	// 		if (i == (cmd_count - 1)) // if at last cmd
+	// 		{
+	// 			dup2(file_fd.out, STDOUT_FILENO);
+	// 			close(file_fd.out);
+	// 		}
+	// 		else
+	// 			dup2(pfd[W_END], STDOUT_FILENO); //	replace pfd[1] with stdout to become write end of the pipe
+	// 		close(pfd[W_END]);
+	// 		callexecve(argv[j], env);
+	// 	}
+	// 	else if (pid > 0) // * PARENT 
+	// 	{
+	// 		close(pfd[W_END]); // lose unused end (the writing end) of the pipe
+	// 		if (i != (cmd_count - 1)) // if not at last cmd 
+	// 			dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
+	// 		close(pfd[R_END]); 	// lose it immediately as it will no longer be used
+	// 		waitpid(pid, NULL, 0);
+	// 	}
+	// 	j++;
+	// }
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 	{
 		if (unlink("here_doc") == -1)

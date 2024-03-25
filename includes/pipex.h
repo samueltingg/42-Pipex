@@ -17,6 +17,15 @@ typedef struct t_file
 	int	out;
 }		t_file;
 
+typedef struct s_vars
+{
+	int fd_in;
+	int fd_out;
+	char **cmds;
+	int cmd_count;
+
+}			t_vars;
+
 // types of error
 enum e_type {
 	OPEN,
