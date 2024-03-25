@@ -6,7 +6,7 @@
 /*   By: sting <sting@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 15:46:10 by sting             #+#    #+#             */
-/*   Updated: 2024/03/22 15:07:19 by sting            ###   ########.fr       */
+/*   Updated: 2024/03/25 16:05:01 by sting            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,10 +63,7 @@ char *get_cmd_path(char *cmd, char **env) // * TESTED!
         {
             free(path);
             if (str_arr[i + 1] == NULL) // if at last str && access() show fail
-            {
-                perror("invalid cmd");
-                exit(EXIT_FAILURE);
-            }
+                exit_if_error(INVALID_CMD); 
         }   
     }
     free_str_arr(str_arr);
@@ -78,10 +75,15 @@ void    callexecve(char *cmd, char **env)
     char **args;
     char *path;
 
-    args = ft_split(cmd, ' ');
+	if (cmd[0] == '\0')
+        exit_if_error(INVALID_CMD);
+    args = ft_split(cmd, ' '); // ! malloc error?
     if (args == NULL)
         exit(EXIT_FAILURE); // ! free other stuff?
-    path = get_cmd_path(args[0], env);
+    if (access(args[0], X_OK) != -1)
+        path = args[0];
+    else
+        path = get_cmd_path(args[0], env);
     if (execve(path, args, env) == -1)
     {
         perror("execve");

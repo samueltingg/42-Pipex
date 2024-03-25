@@ -6,14 +6,27 @@
 /*   By: sting <sting@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 15:46:10 by sting             #+#    #+#             */
-/*   Updated: 2024/03/25 14:13:41 by sting            ###   ########.fr       */
+/*   Updated: 2024/03/25 16:02:34 by sting            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include ".././includes/pipex.h"
 
 
-
+void exit_if_error(enum e_type type)
+{
+	if (type == OPEN)
+		perror("Unable to open the file");
+	if (type == PIPE)
+		perror("Pipe");
+	if (type == FORK)
+		perror("Fork");
+	if (type == UNLINK)
+		perror("Error deleting file");
+	if (type == INVALID_CMD)
+		perror("Invalid command");
+	exit(EXIT_FAILURE);
+}
 
 
 /*
@@ -23,10 +36,8 @@
 */
 int main(int argc, char **argv, char **env)
 {
-	// * parse "infile" & "outfile"
 	t_file file_fd;
 	int cmd_count;
-
 	int i;
 	int j;
 	int pfd[2];
@@ -38,18 +49,18 @@ int main(int argc, char **argv, char **env)
 		exit(EXIT_FAILURE);
 	}
 	
-
-	
 	// ? here_doc =======
-	
 	i = -1;
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 	{
 		cmd_count = argc - 4;
 		j = 3;
-		file_fd.in = open(argv[1], O_WRONLY | O_CREAT, 0666);
-		printf("here?\n");
+		file_fd.in = open(argv[1], O_RDWR | O_CREAT, 0666);
+		if (file_fd.in == -1)
+			exit_if_error(OPEN);
 		file_fd.out = open(argv[argc - 1], (O_WRONLY | O_CREAT | O_APPEND), 0666);
+		if (file_fd.out == -1)
+			exit_if_error(OPEN);
 		while(1)
 		{
 			ft_printf("> ");
@@ -58,46 +69,35 @@ int main(int argc, char **argv, char **env)
 				break;
 			write(file_fd.in, str, ft_strlen(str));
 		}
-		close(file_fd.in); // ! have to close and reopne as readonly
+		close(file_fd.in); // have to close and reopen as RDONLY, as file position pointer is at eof
 		file_fd.in = open(argv[1], O_RDONLY);
 	}
 	else 
 	{
 		cmd_count = argc - 3;
 		j = 2;
-		
 		file_fd.in = open(argv[1], O_RDONLY); 
+		if (file_fd.in == -1)
+		{
+			perror("Unable to open the file");
+			file_fd.in = open("/dev/null", O_RDONLY);
+		}
 		file_fd.out = open(argv[argc - 1], (O_WRONLY | O_CREAT | O_TRUNC), 0666);
+		if (file_fd.out == -1)
+			exit_if_error(OPEN);
 	}
-	
-	if (file_fd.in == -1)
-	{
-		perror("Unable to open the file");
-		exit(EXIT_FAILURE);
-	}
-	if (file_fd.out == -1)
-	{
-		perror("Unable to open the file");
-		exit(EXIT_FAILURE);
-	}
-	
 	// ? ==========
-
 
 	dup2(file_fd.in, STDIN_FILENO);
 	close(file_fd.in); // ! where to close ?
 	while (++i < cmd_count)
 	{
 		if (pipe(pfd) == -1) // * PIPE
-		{
-			perror("pipe");
-			exit(EXIT_FAILURE);
-		}
+			exit_if_error(PIPE);
 		pid = fork(); // * FORK
 		if (pid == -1)
 		{
-			perror("fork");
-			exit(EXIT_FAILURE);
+			exit_if_error(FORK);
 		}
 		else if (pid == 0) // * CHILD
 		{
@@ -125,10 +125,7 @@ int main(int argc, char **argv, char **env)
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 	{
 		if (unlink("here_doc") == -1)
-		{
-			perror("Error deleting file");
-			exit(EXIT_FAILURE);
-		}
+			exit_if_error(UNLINK);
 	}
 }
  
