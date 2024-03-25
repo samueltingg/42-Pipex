@@ -27,7 +27,10 @@ LIBFT.A = $(LIBFT_DIR)libft.a
 
 NAME = pipex
 
+
 all:  $(OBJDIR) $(NAME)
+
+bonus: all
 
 $(OBJDIR):
 		@mkdir -p $(OBJDIR) && echo "$(GREEN)$(OBJDIR) was created$(RESET)"
