@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: sting <sting@student.42kl.edu.my>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/03/26 11:13:25 by sting             #+#    #+#             */
+/*   Updated: 2024/03/26 11:13:26 by sting            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PIPEX_H
 # define PIPEX_H
 
@@ -13,22 +25,23 @@
 
 typedef struct t_file
 {
-	int	in;
-	int	out;
-}		t_file;
+	int		in;
+	int		out;
+}			t_file;
 
 typedef struct s_info
 {
-	int fd_in;
-	int fd_out;
-	char **cmds;
-	int cmd_count;
-	pid_t pid;
+	int		fd_in;
+	int		fd_out;
+	char	**cmds;
+	int		cmd_count;
+	pid_t	pid;
 
 }			t_info;
 
 // types of error
-enum e_type {
+enum		e_type
+{
 	OPEN,
 	PIPE,
 	FORK,
@@ -39,8 +52,8 @@ enum e_type {
 	EXECVE,
 };
 
-char	*get_cmd_path(char *cmd, char **env);
-void    callexecve(char *cmd, char **env);
-void exit_if_error(enum e_type type);
+char		*get_cmd_path(char *cmd, char **env);
+void		callexecve(char *cmd, char **env);
+void		exit_if_error(enum e_type type);
 
 #endif
