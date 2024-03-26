@@ -6,7 +6,7 @@
 /*   By: sting <sting@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 15:46:10 by sting             #+#    #+#             */
-/*   Updated: 2024/03/26 13:47:44 by sting            ###   ########.fr       */
+/*   Updated: 2024/03/26 15:52:50 by sting            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	pipe_execution(t_info info, char **env, int i)
 		exit_if_error(PIPE);
 	info.pid = fork(); // * FORK
 	if (info.pid == -1)
-		exit_if_error(FORK);
+		exit_if_error(FORK); 
 	else if (info.pid == 0) // * CHILD
 	{
 		close(pfd[R_END]); // close unused end (the reading end) of the pipe
@@ -37,7 +37,7 @@ void	pipe_execution(t_info info, char **env, int i)
 		if (i != (info.cmd_count - 1)) // if not at last cmd
 			dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
 		close(pfd[R_END]); // close it immediately as it will no longer be used
-		// waitpid(info.pid, NULL, 0);
+		waitpid(info.pid, NULL, 0);
 	}
 }
 
@@ -104,7 +104,6 @@ int	main(int argc, char **argv, char **env)
 	i = -1;
 	while (++i < info.cmd_count)
 		pipe_execution(info, env, i);
-	wait(NULL);
 	close(info.fd_out);
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 		if (unlink("here_doc") == -1)
