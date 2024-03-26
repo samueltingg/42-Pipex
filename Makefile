@@ -12,7 +12,8 @@ ORANGE = \033[0;38;5;166m
 SRCDIR = srcs/
 SRCS_FIL = \
 			main.c \
-			execve_utils.c			
+			execve_utils.c \
+			exit_handler.c		
   
 SRCS = $(addprefix $(SRCDIR), $(SRCS_FIL))
 
@@ -24,9 +25,7 @@ OBJS = $(addprefix $(OBJDIR), $(notdir $(SRCS:.c=.o)))
 LIBFT_DIR = libft/
 LIBFT.A = $(LIBFT_DIR)libft.a
 
-
 NAME = pipex
-
 
 all:  $(OBJDIR) $(NAME)
 
