@@ -6,7 +6,7 @@
 /*   By: sting <sting@student.42kl.edu.my>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/12 15:46:10 by sting             #+#    #+#             */
-/*   Updated: 2024/03/26 15:52:50 by sting            ###   ########.fr       */
+/*   Updated: 2024/03/27 11:30:05 by sting            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void	pipe_execution(t_info info, char **env, int i)
 		else
 			dup2(pfd[W_END], STDOUT_FILENO); //	replace pfd[1] with stdout to become write end of the pipe
 		close(pfd[W_END]);
+		// write(2, "calling exec\n", 13);
 		callexecve(info.cmds[i], env);
 	}
 	else if (info.pid > 0) // * PARENT
@@ -37,7 +38,7 @@ void	pipe_execution(t_info info, char **env, int i)
 		if (i != (info.cmd_count - 1)) // if not at last cmd
 			dup2(pfd[R_END], STDIN_FILENO); // replace pfd[0] with stdin to become read end of the pipe
 		close(pfd[R_END]); // close it immediately as it will no longer be used
-		waitpid(info.pid, NULL, 0);
+		// waitpid(info.pid, NULL, 0);
 	}
 }
 
@@ -105,6 +106,10 @@ int	main(int argc, char **argv, char **env)
 	while (++i < info.cmd_count)
 		pipe_execution(info, env, i);
 	close(info.fd_out);
+	i = -1;
+	while (++i < info.cmd_count)
+		wait(NULL);
+	// write(1, "parent done\n", 12);
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 		if (unlink("here_doc") == -1)
 			exit_if_error(UNLINK);
