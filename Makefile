@@ -1,5 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -std=c99 -fsanitize=address -g
+CFLAGS = -Wall -Wextra -Werror -std=c99
+# -fsanitize=address -g
 INCLUDES = -I ./includes/ -I$(LIBFT_DIR)
 
 # COLORS
@@ -12,8 +13,8 @@ SRCDIR = srcs/
 SRCS_FIL = \
 			main.c \
 			execve_utils.c \
-			exit_handler.c		
-  
+			exit_handler.c
+
 SRCS = $(addprefix $(SRCDIR), $(SRCS_FIL))
 
 # OBS
